@@ -61,7 +61,7 @@ function blocks(list, inEx = false) {
 
 const body = blocks(C);
 const doc = new Document({
-  creator: 'Mocheqi dashboard', title: 'Перенос дашборда Mocheqi на сервер',
+  creator: 'MP Control', title: 'Перенос MP Control на сервер',
   styles: {
     default: { document: { run: { font: FONT, size: 22, color: INK }, paragraph: { spacing: { after: 100, line: 276 } } } },
     paragraphStyles: [
@@ -76,10 +76,10 @@ const doc = new Document({
   sections: [{
     properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } } },
     footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT,
-      children: [new TextRun({ text: 'Mocheqi — перенос на сервер · стр. ', size: 16, color: MUTED }),
+      children: [new TextRun({ text: 'MP Control — перенос на сервер · стр. ', size: 16, color: MUTED }),
         new TextRun({ children: [PageNumber.CURRENT], size: 16, color: MUTED })] })] }) },
     children: [
-      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun('Перенос дашборда Mocheqi на сервер')] }),
+      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun('Перенос MP Control на сервер')] }),
       new Paragraph({ spacing: { after: 240 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: ACC, space: 6 } },
         children: [new TextRun({ text: 'Установка, перенос базы, обновления через GitHub · редакция от ' + new Date().toLocaleDateString('ru-RU'), color: MUTED, size: 20 })] }),
       new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'Содержание', bold: true })] }),

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Локальный веб-сервер дашборда: http://127.0.0.1:8765"""
+"""Локальный веб-сервер дашборда: http://127.0.0.1:8766"""
 import base64, datetime as dt, io, json, os, subprocess, sys, threading, time, uuid, webbrowser
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
 import db, metrics, auth, wbplan, prices, monthly, today, supplies, appconfig, media, promos
 
-PORT = 8765
+PORT = 8766
 LAN_URL = None  # адрес для других устройств в сети, если включён [server] network = 1
 STATIC = os.path.join(db.APP_DIR, "static")
 MIME = {".html": "text/html; charset=utf-8", ".js": "application/javascript; charset=utf-8",
@@ -746,18 +746,18 @@ class H(BaseHTTPRequestHandler):
         try:
             parts = p.strip("/").split("/")[1:]
             name = parts[0] if parts else ""
-            token = self.cookie("mp_session")
+            token = self.cookie("mpc_session")
             self.user = auth.session_user(con, token)
             if name == "login" and method == "POST":
                 b = self.body()
                 tok = auth.login(con, b.get("phone"), b.get("password"))
                 if not tok:
                     self.send_json({"error": "Неверный телефон или пароль"}, 401); return
-                self.send_json({"ok": True}, cookie=f"mp_session={tok}; Path=/; HttpOnly; SameSite=Lax; Max-Age={auth.SESSION_DAYS * 86400}")
+                self.send_json({"ok": True}, cookie=f"mpc_session={tok}; Path=/; HttpOnly; SameSite=Lax; Max-Age={auth.SESSION_DAYS * 86400}")
                 return
             if name == "logout":
                 auth.logout(con, token)
-                self.send_json({"ok": True}, cookie="mp_session=; Path=/; Max-Age=0"); return
+                self.send_json({"ok": True}, cookie="mpc_session=; Path=/; Max-Age=0"); return
             if auth.has_users(con):
                 if not self.user:
                     self.send_json({"error": "login", "need_login": True}, 401); return

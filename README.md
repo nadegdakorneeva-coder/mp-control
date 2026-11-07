@@ -11,7 +11,7 @@ Python 3 (стандартная библиотека + openpyxl), SQLite, ве�
 - `app/costs_seed.json` — себестоимость.
 
 ## Запуск на Windows
-`start.bat` — сервер на http://127.0.0.1:8765, `install_schedule.bat` — задачи Windows (ночная загрузка,
+`start.bat` — сервер на http://127.0.0.1:8766, `install_schedule.bat` — задачи Windows (ночная загрузка,
 цены и поставки в 10/14/18, заказы каждые 30 минут), `widget.bat` — виджет.
 
 ## Структура

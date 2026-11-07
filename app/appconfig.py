@@ -13,7 +13,7 @@ import db
 
 # (раздел, ключ, подпись, тип, подсказка). Типы: secret, text, num, select:<v1=подпись|v2=подпись>, bool
 FIELDS = [
-    ("shop", "name", "Название магазина", "text", "показывается в меню и в заголовке; по умолчанию Mocheqi"),
+    ("shop", "name", "Название магазина", "text", "показывается в меню и в заголовке; по умолчанию MP Control"),
     ("wb", "token", "WB: основной ключ (только чтение)", "secret",
      "Кабинет WB → Профиль → Настройки → Доступ к API → Создать токен, тип «Базовый», «Только на чтение». "
      "Категории: Контент, Статистика, Аналитика, Цены и скидки, Маркетплейс, Поставки, Продвижение, Финансы, Документы."),
@@ -28,10 +28,10 @@ FIELDS = [
     ("gsheet", "url", "Google Таблица с операциями", "text", "ссылка на экспорт CSV листа с операциями; пусто — импорт выключен"),
     ("gsheet", "start", "Операции из таблицы с даты", "text", "ГГГГ-ММ-ДД"),
     ("server", "network", "Доступ из сети", "bool", "открывать дашборд другим устройствам (нужен хотя бы один пользователь). Действует после перезапуска"),
-    ("server", "port", "Порт", "num", "по умолчанию 8765; действует после перезапуска"),
+    ("server", "port", "Порт", "num", "по умолчанию 8766; действует после перезапуска"),
 ]
-DEFAULTS = {("shop", "name"): "Mocheqi", ("tax", "usn_percent"): "6", ("tax", "nds_percent"): "0", ("tax", "base"): "sales",
-            ("gsheet", "start"): "2026-06-01", ("server", "network"): "0", ("server", "port"): "8765"}
+DEFAULTS = {("shop", "name"): "MP Control", ("tax", "usn_percent"): "6", ("tax", "nds_percent"): "0", ("tax", "base"): "sales",
+            ("gsheet", "start"): "2026-06-01", ("server", "network"): "0", ("server", "port"): "8766"}
 COMMENTS = {"shop": "Магазин", "wb": "Wildberries", "ozon": "Ozon", "tax": "Налоги (режим «по ставкам»)",
             "gsheet": "Google Таблица с операциями", "server": "Сервер дашборда"}
 
@@ -56,7 +56,7 @@ def read():
 
 
 def shop_name():
-    return db.config().get("shop", "name", fallback="Mocheqi").strip() or "Mocheqi"
+    return db.config().get("shop", "name", fallback="MP Control").strip() or "MP Control"
 
 
 def save(b):

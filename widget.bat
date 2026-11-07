@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-rem Запуск виджета Mocheqi поверх всех окон (без чёрного окна).
+rem Запуск виджета MP Control поверх всех окон (без чёрного окна).
 cd /d "%~dp0app"
 where pyw >nul 2>&1 && (start "" pyw -3 widget.pyw & exit /b)
 where pythonw >nul 2>&1 && (start "" pythonw widget.pyw & exit /b)

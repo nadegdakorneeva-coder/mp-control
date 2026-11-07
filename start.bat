@@ -1,5 +1,6 @@
 @echo off
 chcp 65001 >nul
+title MP Control
 cd /d "%~dp0"
 set PY=
 py -3 -c "import sys" >nul 2>&1 && set PY=py -3

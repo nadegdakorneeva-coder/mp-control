@@ -1,6 +1,6 @@
 // guide.js → README.md (для GitHub)
 const C = require('./guide.js');
-const out = ['# Перенос дашборда Mocheqi на сервер', ''];
+const out = ['# Перенос MP Control на сервер', ''];
 const blk = (b, q = '') => {
   switch (b.t) {
     case 'h2': out.push('## ' + b.x, ''); break;

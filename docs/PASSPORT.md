@@ -246,19 +246,28 @@
 - 07.11 — Настройки в интерфейсе с проверкой ключей; Маркетинг: Фотоконтент (замена фото WB, бэкап, откат, массовая загрузка) и Акции (WB/Ozon, сортировка, подсветка, кружки в меню).
 
 - 07.11.2026 (mp-control) — создан репозиторий nadegdakorneeva-coder/mp-control копией mocheqi @4418dcd; рабочая папка D:\MPControl; добавлены шапка паспорта и список «Что убрать для продукта».
+- 07.11.2026 (mp-control) — работа рядом с Mocheqi: порт 8766, cookie mpc_session, задачи Windows «MP Control - …», ярлык виджета и правило брандмауэра «MP Control», виджет читает порт из config.ini; название MP Control по умолчанию; серверные скрипты → mpcontrol / /opt/mpcontrol / mp-control.
 
 ## Что убрать для продукта (на 07.11.2026, mp-control)
 
-**Сначала — чтобы не задеть Mocheqi на том же ПК** (сейчас D:\MPControl стоит рядом с D:\MP\dashboard):
-- `install_schedule.bat` / `remove_schedule.bat` регистрируют и удаляют задачи Windows с теми же именами, что у Mocheqi («MP Dashboard - daily update / price check / today orders», `-Force`) — **не запускать из D:\MPControl**, пока имена не изменены, иначе ночные загрузки Mocheqi будут перезаписаны или удалены.
-- `widget_autostart.bat` создаёт тот же ярлык «Mocheqi widget.lnk» в автозагрузке; `allow_network.bat` — то же правило брандмауэра «MP Dashboard 8765».
-- Порт **8765** занят Mocheqi: при пробном запуске MP Control рядом задать другой порт в `config.ini` (`[server] port`).
+**Работа рядом с Mocheqi на одном ПК — сделано 07.11.2026.** Обе программы можно запускать одновременно, у MP Control всё своё:
+| Что | Mocheqi (D:\MP\dashboard) | MP Control (D:\MPControl) |
+|---|---|---|
+| Порт по умолчанию | 8765 | **8766** (`server.py`, `appconfig.py`, `config.example.ini`, `install.sh`; виджет берёт порт из `config.ini`) |
+| Cookie входа | `mp_session` | **`mpc_session`** (браузер не делит cookie по портам — иначе вход в одну программу выкидывал из другой) |
+| Задачи Windows | «MP Dashboard - …» | **«MP Control - daily update / price check / today orders»** |
+| Ярлык виджета в автозагрузке | «Mocheqi widget» | **«MP Control widget»** |
+| Правило брандмауэра | «MP Dashboard 8765» | **«MP Control 8766»** |
+| Окно start.bat, виджет, вкладка | Mocheqi | **MP Control** (если в config.ini `[shop] name = Mocheqi` — будет Mocheqi) |
+| Сервер Linux | пользователь/служба `mocheqi`, `/opt/mocheqi` | **`mpcontrol`, `/opt/mpcontrol`**, репозиторий mp-control |
+
+Данные (`data/`, `config.ini`) у каждой папки свои. **Общее только одно — ключи API**, если вписать в MP Control ключи Mocheqi: лимиты WB (финотчёт 1 запрос/мин и др.) общие на токен, поэтому одновременные полные загрузки обеих программ могут получать 429. Для пробы на ключах Mocheqi не ставить расписание MP Control на 05:00 (или не ставить вовсе) и полную загрузку запускать не одновременно с Mocheqi.
 
 **Название и данные Mocheqi в коде:**
-- Название: `index.html` (title, логотип «M»), `app.js` (вход, заголовок, текст «Данные для входа», подсказка «страница бренда MOCHEQI»), `appconfig.py` и `config.example.ini` (имя магазина по умолчанию), `widget.pyw`, `widget*.bat`.
+- Название: ~~интерфейс, виджет, bat-файлы, имя по умолчанию~~ — сделано 07.11 (MP Control); осталось: подсказка «страница бренда MOCHEQI» в app.js (проверка наличия WB).
 - `db.py`: стартовые магазины «Mocheqi» / «Mocheqi_Ozon».
 - `app/rrp_seed.json` + `prices.py`: МРЦ из прайса MOCHEQI автоматически грузятся в пустую таблицу — у нового селлера их быть не должно.
 - `gsheet.py`: жёстко заданы лист «Мосийчук М.В. 2026», колонки счетов (СБЕР, наличные Игорь/Наташа/Олег, Касса), правила типов операций и год 2026 — нужна настраиваемая схема импорта.
-- `server/` (install.sh, update.sh, after_upload.sh, README, инструкции): пользователь и папки `mocheqi`, `/opt/mocheqi`, служба `mocheqi.service`.
+- ~~`server/`: пользователь, папки, службы mocheqi~~ — сделано 07.11 (mpcontrol, /opt/mpcontrol, репозиторий mp-control). Word-инструкции по переезду ещё не пересобраны.
 - `help_build/` и `help.html`: заголовки и примеры с Mocheqi; `README.md`.
 - Бэклог продукта (из раздела 10): установка для других селлеров на отдельном сервере, затем SaaS — мультиарендность, PostgreSQL, очередь задач, оплата, 152-ФЗ.

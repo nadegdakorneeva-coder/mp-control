@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Mocheqi — маленькое окно поверх всех окон с критическими сигналами:
+"""MP Control — маленькое окно поверх всех окон с критическими сигналами:
 цены ниже МРЦ, заканчивается товар на складах Ozon / WB, давно не обновлялись данные.
 Читает ту же базу, что и дашборд (сервер для работы не нужен). Обновляется каждые 5 минут.
 Запуск: widget.bat в папке дашборда. Перетаскивается за заголовок; правая кнопка — меню."""
@@ -18,7 +18,11 @@ sys.path.insert(0, APP)
 import db  # noqa: E402
 
 REFRESH_MS = 5 * 60 * 1000
-URL = "http://127.0.0.1:8765/"
+try:  # тот же порт, что у сервера ([server] port в config.ini)
+    PORT = db.config().getint("server", "port", fallback=8766)
+except Exception:
+    PORT = 8766
+URL = f"http://127.0.0.1:{PORT}/"
 STATE = os.path.join(db.DATA_DIR, "widget.json")
 COL = {"red": "#c62828", "amber": "#d08700", "ok": "#2e7d32", "info": "#8a8a85"}
 HEAD_BG = {"red": "#c62828", "amber": "#b77900", "ok": "#2f6f3a", "info": "#55554f"}
@@ -69,7 +73,7 @@ def compute():
 
 def server_alive():
     try:
-        with socket.create_connection(("127.0.0.1", 8765), timeout=0.5):
+        with socket.create_connection(("127.0.0.1", PORT), timeout=0.5):
             return True
     except OSError:
         return False
@@ -92,7 +96,7 @@ class Widget:
     def __init__(self):
         self.st = load_state()
         self.root = tk.Tk()
-        self.root.title("Mocheqi")
+        self.root.title("MP Control")
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
         try:
@@ -112,7 +116,7 @@ class Widget:
         self.frame.pack(padx=1, pady=1, fill="both", expand=True)
         self.head = tk.Frame(self.frame, bg=HEAD_BG["info"])
         self.head.pack(fill="x")
-        self.title = tk.Label(self.head, text="Mocheqi · загрузка…", fg="white", bg=HEAD_BG["info"],
+        self.title = tk.Label(self.head, text="MP Control · загрузка…", fg="white", bg=HEAD_BG["info"],
                               font=(FONT, 10, "bold"), anchor="w", padx=10, pady=6)
         self.title.pack(side="left", fill="x", expand=True)
         self.btns = []
@@ -168,7 +172,7 @@ class Widget:
 
     # --- данные ---
     def refresh(self):
-        self.title.config(text="Mocheqi · обновляю…")
+        self.title.config(text="MP Control · обновляю…")
         threading.Thread(target=self._load, daemon=True).start()
 
     def _load(self):
@@ -201,7 +205,7 @@ class Widget:
             w.destroy()
         if err or not data:
             self.set_head("info")
-            self.title.config(text="Mocheqi · нет данных")
+            self.title.config(text="MP Control · нет данных")
             tk.Label(self.body, text=f"Не удалось прочитать базу:\n{err}", fg=MUTED, bg=BG, font=(FONT, 9),
                      justify="left", wraplength=320, padx=10, pady=8).pack(anchor="w")
             return
@@ -210,7 +214,7 @@ class Widget:
         ambers = [g for g in data["groups"] if g["level"] == "amber"]
         summary = "всё в порядке" if not reds and not ambers else \
             ", ".join(x for x in (f"{len(reds)} крит." if reds else "", f"{len(ambers)} вним." if ambers else "") if x)
-        self.title.config(text=f"Mocheqi · {summary} · {data['generated'][-5:]}")
+        self.title.config(text=f"MP Control · {summary} · {data['generated'][-5:]}")
         self.set_head(data["level"])
         for g in data["groups"]:
             row = tk.Frame(self.body, bg=BG, cursor="hand2")

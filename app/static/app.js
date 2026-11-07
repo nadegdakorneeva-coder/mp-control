@@ -13,7 +13,7 @@ const api = async (path, opt = {}) => {
 function showLogin(msg = "") {
   if ($("#login")) return;
   document.body.insertAdjacentHTML("beforeend", `<div id="login" class="login"><form class="box" autocomplete="on">
-    <div class="brand"><span class="logo">M</span><div><b>Mocheqi</b><small>Вход в дашборд</small></div></div>
+    <div class="brand"><span class="logo">MP</span><div><b>MP Control</b><small>Вход в дашборд</small></div></div>
     <label>Телефон<input id="lgP" type="tel" name="username" autocomplete="username" placeholder="+7 900 000-00-00" required></label>
     <label>Пароль<input id="lgW" type="password" name="password" autocomplete="current-password" required></label>
     <div id="lgE" class="lg-err">${esc(msg)}</div>
@@ -242,7 +242,7 @@ async function render() {
   const p = PAGES[page];
   $$("#nav a").forEach(a => a.classList.toggle("on", a.dataset.page === page));
   $("#pageTitle").textContent = p.t;
-  document.title = p.t + " — " + ((META && META.shop_name) || "Mocheqi");
+  document.title = p.t + " — " + ((META && META.shop_name) || "MP Control");
   charts.forEach(c => c.destroy()); charts = [];
   $("#alert").innerHTML = "";
   $("#page").innerHTML = `<div class="empty">Загрузка…</div>`;
@@ -1459,7 +1459,7 @@ async function pageUsers(root) {
     function showCreds(b) {
       const addr = a.lan_url || location.origin + "/";
       const ph = "+" + b.phone.replace(/\D/g, "").replace(/^8(?=\d{10}$)/, "7").replace(/^(?=\d{10}$)/, "7");
-      const text = `Вход в дашборд Mocheqi\nАдрес: ${addr}\nТелефон: ${ph}\nПароль: ${b.password}`;
+      const text = `Вход в дашборд ${(META && META.shop_name) || "MP Control"}\nАдрес: ${addr}\nТелефон: ${ph}\nПароль: ${b.password}`;
       $("#drawer .box").innerHTML = `<h3>Данные для входа<button class="btn ghost" data-close>✕</button></h3>
         <p>Передайте сотруднику${b.name ? " <b>" + esc(b.name) + "</b>" : ""}:</p>
         <pre class="creds">${esc(text)}</pre>
@@ -1494,7 +1494,7 @@ function openDrawer(html) {
 function closeDrawer() { $("#drawer").classList.add("hidden"); $("#drawer").innerHTML = ""; }
 
 async function loadMeta() { META = await api("meta"); showUpd(META); applyAccess();
-  const sn = META.shop_name || "Mocheqi"; const bb = $("#nav").parentElement.querySelector(".brand b"); if (bb) bb.textContent = sn;
+  const sn = META.shop_name || "MP Control"; const bb = $("#nav").parentElement.querySelector(".brand b"); if (bb) bb.textContent = sn;
   const lg = $("#nav").parentElement.querySelector(".brand .logo"); if (lg) lg.textContent = sn.slice(0, 1).toUpperCase(); }
 function showUpd(m) {
   $("#updStatus").innerHTML = (m.running ? "Идёт обновление…<br>" : "") + (m.update_status ? esc(m.update_status) + "<br>" : "") +

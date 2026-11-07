@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Установка дашборда Mocheqi на сервер Ubuntu (22.04 / 24.04).
+# Установка MP Control на сервер Ubuntu (22.04 / 24.04).
 # Запуск:  sudo bash install.sh
 # Повторный запуск безопасен: уже сделанные шаги пропускаются, база и config.ini не трогаются.
 set -euo pipefail
 
-REPO_SSH="git@github.com:nadegdakorneeva-coder/mocheqi.git"
-APP_USER="mocheqi"
-HOME_DIR="/opt/mocheqi"
+REPO_SSH="git@github.com:nadegdakorneeva-coder/mp-control.git"
+APP_USER="mpcontrol"
+HOME_DIR="/opt/mpcontrol"
 DIR="$HOME_DIR/dashboard"
-PORT_DEFAULT=8765
+PORT_DEFAULT=8766
 TZ_NAME="Europe/Moscow"
 
 say()  { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
@@ -33,12 +33,12 @@ install -d -o "$APP_USER" -g "$APP_USER" -m 700 "$HOME_DIR/.ssh"
 say "3/8. Ключ доступа к GitHub (только чтение)"
 KEY="$HOME_DIR/.ssh/id_ed25519"
 if [ ! -f "$KEY" ]; then
-  sudo -u "$APP_USER" ssh-keygen -q -t ed25519 -N "" -C "mocheqi-server" -f "$KEY"
+  sudo -u "$APP_USER" ssh-keygen -q -t ed25519 -N "" -C "mpcontrol-server" -f "$KEY"
 fi
 sudo -u "$APP_USER" bash -c "ssh-keyscan -t ed25519 github.com >> $HOME_DIR/.ssh/known_hosts 2>/dev/null; sort -u -o $HOME_DIR/.ssh/known_hosts $HOME_DIR/.ssh/known_hosts"
 until sudo -u "$APP_USER" git ls-remote "$REPO_SSH" >/dev/null 2>&1; do
   echo
-  echo "    Добавьте этот ключ в GitHub: репозиторий mocheqi → Settings → Deploy keys → Add deploy key"
+  echo "    Добавьте этот ключ в GitHub: репозиторий mp-control → Settings → Deploy keys → Add deploy key"
   echo "    Title: server, галочку «Allow write access» НЕ ставить."
   echo
   echo "    ----------8<----------"
@@ -61,9 +61,9 @@ chmod +x "$DIR/server/"*.sh
 
 say "5/8. Адрес дашборда"
 PORT=$PORT_DEFAULT
-while ss -ltnH "sport = :$PORT" | grep -q . && ! systemctl is-active --quiet mocheqi 2>/dev/null; do PORT=$((PORT+1)); done
+while ss -ltnH "sport = :$PORT" | grep -q . && ! systemctl is-active --quiet mpcontrol 2>/dev/null; do PORT=$((PORT+1)); done
 [ "$PORT" != "$PORT_DEFAULT" ] && warn "порт $PORT_DEFAULT занят другой программой — дашборд будет на порту $PORT"
-DOMAIN=$(ask "Домен для дашборда (например dash.mocheqi.ru). Нет домена — просто Enter:")
+DOMAIN=$(ask "Домен для дашборда (например dash.example.ru). Нет домена — просто Enter:")
 NETWORK=1; MODE="ip"
 if [ -n "$DOMAIN" ]; then
   if command -v nginx >/dev/null; then MODE="nginx"; NETWORK=0
@@ -100,9 +100,9 @@ ok "network=$NETWORK, port=$PORT"
 
 say "7/8. Службы и расписание"
 SYS=/etc/systemd/system
-cat > $SYS/mocheqi.service <<UNIT
+cat > $SYS/mpcontrol.service <<UNIT
 [Unit]
-Description=Mocheqi dashboard (WB + Ozon)
+Description=MP Control dashboard (WB + Ozon)
 After=network-online.target
 Wants=network-online.target
 [Service]
@@ -118,20 +118,20 @@ UNIT
 
 job() {  # имя, описание, команда, расписание (OnCalendar, можно несколько через ;), [от root]
   local name=$1 desc=$2 cmd=$3 cal=$4 user=${5:-$APP_USER}
-  cat > $SYS/mocheqi-$name.service <<UNIT
+  cat > $SYS/mpcontrol-$name.service <<UNIT
 [Unit]
-Description=Mocheqi: $desc
+Description=MP Control: $desc
 [Service]
 Type=oneshot
 User=$user
 WorkingDirectory=$DIR
 Environment=TZ=$TZ_NAME PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/flock -n /tmp/mocheqi-$name.lock $cmd
+ExecStart=/usr/bin/flock -n /tmp/mpcontrol-$name.lock $cmd
 TimeoutStartSec=3h
 UNIT
-  { echo "[Unit]"; echo "Description=Mocheqi: $desc (расписание)"; echo "[Timer]"
+  { echo "[Unit]"; echo "Description=MP Control: $desc (расписание)"; echo "[Timer]"
     IFS=';' read -ra C <<< "$cal"; for c in "${C[@]}"; do echo "OnCalendar=$c $TZ_NAME"; done
-    echo "Persistent=false"; echo "[Install]"; echo "WantedBy=timers.target"; } > $SYS/mocheqi-$name.timer
+    echo "Persistent=false"; echo "[Install]"; echo "WantedBy=timers.target"; } > $SYS/mpcontrol-$name.timer
 }
 job daily   "ночная загрузка данных"            "/usr/bin/python3 app/collector.py"            "*-*-* 05:00:00"
 job prices  "цены и статусы поставок"          "/usr/bin/python3 app/collector.py --prices"   "*-*-* 10:00:00;*-*-* 14:00:00;*-*-* 18:00:00"
@@ -140,15 +140,15 @@ job backup  "резервная копия базы"             "/usr/bin/pytho
 job update  "проверка обновлений на GitHub"    "$DIR/server/update.sh"                         "*:0/5" root
 
 systemctl daemon-reload
-systemctl enable --now mocheqi.service >/dev/null
-for t in daily prices today backup update; do systemctl enable --now mocheqi-$t.timer >/dev/null; done
+systemctl enable --now mpcontrol.service >/dev/null
+for t in daily prices today backup update; do systemctl enable --now mpcontrol-$t.timer >/dev/null; done
 ok "дашборд запущен; загрузки 05:00, цены/поставки 10/14/18, заказы каждые 30 мин 07–23:30, копия базы 03:30, обновления каждые 5 мин"
 
 say "8/8. Доступ из интернета"
 URL="http://$(hostname -I | awk '{print $1}'):$PORT/"
 case $MODE in
   nginx)
-    cat > /etc/nginx/sites-available/mocheqi <<NG
+    cat > /etc/nginx/sites-available/mpcontrol <<NG
 server {
     listen 80;
     server_name $DOMAIN;
@@ -161,7 +161,7 @@ server {
     }
 }
 NG
-    ln -sf /etc/nginx/sites-available/mocheqi /etc/nginx/sites-enabled/mocheqi
+    ln -sf /etc/nginx/sites-available/mpcontrol /etc/nginx/sites-enabled/mpcontrol
     nginx -t && systemctl reload nginx
     if ! command -v certbot >/dev/null; then apt-get install -y -qq certbot python3-certbot-nginx >/dev/null; fi
     certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect \
@@ -178,7 +178,7 @@ NG
     warn "без домена дашборд работает по http (без шифрования). Для постоянной работы лучше подключить домен."
     ;;
 esac
-systemctl restart mocheqi.service
+systemctl restart mpcontrol.service
 
 cat <<DONE
 
