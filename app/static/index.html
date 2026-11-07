@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mocheqi — аналитика МП</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232a78d6'/><path d='M8 22V12l8 6 8-6v10' stroke='white' stroke-width='3' fill='none' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+<aside class="side">
+  <div class="brand"><span class="logo">M</span><div><b>Mocheqi</b><small>WB + Ozon</small></div></div>
+  <nav id="nav">
+    <div class="grp">Оцифровка</div>
+    <a href="#/dashboard" data-page="dashboard">Дашборд</a>
+    <a href="#/summary" data-page="summary">Сводный отчёт</a>
+    <a href="#/monthly" data-page="monthly">Месячный отчёт</a>
+    <div class="grp">Склады</div>
+    <a href="#/wh_ozon" data-page="wh_ozon">Ozon</a>
+    <a href="#/wh_wb" data-page="wh_wb">Wildberries</a>
+    <a href="#/supplies" data-page="supplies">Поставки <span class="nbadge hidden" id="supBadge"></span></a>
+    <div class="grp">Финансы</div>
+    <a href="#/dds" data-page="dds">ДДС</a>
+    <a href="#/pnl" data-page="pnl">ОПиУ</a>
+    <a href="#/operations" data-page="operations">Операции</a>
+    <div class="grp">Товары</div>
+    <a href="#/costs" data-page="costs">Себестоимость</a>
+    <a href="#/prices" data-page="prices">Контроль цен <span class="nbadge hidden" id="priceBadge"></span></a>
+    <div class="grp">Маркетинг</div>
+    <a href="#/photos" data-page="photos">Фотоконтент</a>
+    <a href="#/promos" data-page="promos">Акции <span class="pbadges" id="promoBadges"></span></a>
+    <div class="grp">Прочее</div>
+    <a href="#/settings" data-page="settings">Счета, статьи, налоги</a>
+    <a href="#/config" data-page="config" class="hidden">Настройки</a>
+    <a href="#/users" data-page="users" class="hidden">Пользователи</a>
+    <a href="#/help" data-page="help">Инструкции</a>
+  </nav>
+  <div id="whoami" class="whoami hidden"></div>
+  <div class="upd">
+    <button id="btnUpdate" class="btn primary w100">Обновить данные</button>
+    <div id="updStatus" class="muted small"></div>
+  </div>
+</aside>
+<main>
+  <header class="top">
+    <h1 id="pageTitle"></h1>
+    <div id="filters" class="filters"></div>
+  </header>
+  <div id="alert"></div>
+  <section id="page"></section>
+</main>
+<div id="drawer" class="drawer hidden"></div>
+<div id="tip" class="tip hidden"></div>
+<script src="/chart.umd.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

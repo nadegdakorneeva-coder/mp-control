@@ -1,0 +1,21 @@
+# Секреты и данные — никогда не попадают в GitHub, живут только на компьютере / сервере
+config.ini
+data/
+raw/
+*.sqlite
+*.sqlite-*
+*.db
+*.log
+# себестоимость — коммерческие данные, уже лежат в базе
+app/costs_seed.json
+# служебное
+__pycache__/
+*.pyc
+probe.py
+probe_api.bat
+node_modules/
+*.docx
+*.pdf
+.DS_Store
+Thumbs.db
+server/to_upload/
